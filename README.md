@@ -1,50 +1,87 @@
 # InDrive Analytics avec dbt
 
-## Partie C
+L’objectif est de transformer les données brutes d’InDrive en tables permettant d’analyser les courses et les gains des chauffeurs.
 
-### 4. Grain de fact_rides
+## Données utilisées
 
-Une ligne représente une course identifiée par `ride_id`.
+Le projet utilise quatre fichiers CSV :
 
-### 5. Dimensions véhicule et zone
+- `raw_drivers` : chauffeurs et notes.
+- `raw_vehicles` : véhicules.
+- `raw_zones` : zones.
+- `raw_ride_events` : courses.
 
-Le Type 1 suffit pour `dim_vehicle` et `dim_zone` car on a seulement besoin de leurs informations actuelles, sans historique.
+## Organisation du projet
 
-### 6. Snapshot des chauffeurs
+| Dossier                            | Contenu                                        |
+| ---------------------------------- | ---------------------------------------------- |
+| `dbt_project/seeds/`               | Données CSV                                    |
+| `dbt_project/models/staging/`      | Typage des données sources                     |
+| `dbt_project/models/intermediate/` | Enrichissement des courses                     |
+| `dbt_project/models/marts/`        | Dimensions, table de faits et gains quotidiens |
+| `dbt_project/snapshots/`           | Historique des notes des chauffeurs            |
+| `dbt_project/macros/`              | Classement des notes par tranche               |
 
-Le snapshot garde les anciennes notes et crée une nouvelle version quand `rating` change. Cet historique est utile pour les chauffeurs, mais il n’est pas demandé pour les véhicules et les zones.
+## Installation
 
-### 7. Jointures du modèle intermédiaire
+Docker et Python doivent être installés.
 
-Le `LEFT JOIN` garde une course même si son chauffeur n’existe pas. Le test de relation peut alors repérer l’erreur, tandis qu’un `INNER JOIN` supprimerait la course.
+Depuis le dossier contenant `docker-compose.yml` :
 
-## Partie D
+```bash
+docker compose up -d
+pip install dbt-postgres==1.9.1 dbt-core==1.10.15
+```
 
-### 9. Macro ou variable
+Copier `dbt_project/profiles.yml.example` dans le dossier personnel `.dbt`, en le renommant `profiles.yml`.
 
-Une macro convient car le classement des notes utilise des conditions SQL. Une variable contient seulement une valeur, comme la date de début.
+Entrer ensuite dans le projet :
 
-### 10. Changement de note
+```bash
+cd dbt_project
+dbt debug
+```
 
-Après le passage de 4.80 à 4.30, les anciennes courses gardent 4.80 car le filtre sur `requested_at` ne les reprend pas. Le flag `--full-refresh` reconstruit ces lignes avec la nouvelle note.
+## Exécution
 
-## Partie E
+Exécuter les commandes dans cet ordre :
 
-### 12. Chauffeur inexistant
+```bash
+dbt seed
+dbt run --select staging
+dbt snapshot
+dbt run
+dbt test
+```
 
-Avec `driver_id = 999`, seul le test `relationships` entre `fact_rides.driver_id` et `dim_driver.driver_id` échoue. Le chauffeur n’existe pas, mais la course est conservée grâce au `LEFT JOIN`.
+La variable `start_date`, définie dans `dbt_project.yml`, permet de choisir la date de début des courses à traiter.
 
-## Partie F
+## Tables principales
 
-### 14. Lignage
+- `dim_driver` : informations actuelles des chauffeurs.
+- `dim_vehicle` : véhicules.
+- `dim_zone` : zones.
+- `fact_rides` : une ligne par course.
+- `fct_driver_daily_earnings` : gains quotidiens, cumul et classement des chauffeurs.
 
-Oui, `int_rides_enriched` apparaît dans le lignage même s’il est éphémère. dbt connaît ses liens grâce aux `ref()`, sans créer de table pour ce modèle.
+Le snapshot conserve les changements de notes. `fact_rides` utilise un chargement incrémental.
 
-## Preuve d’exécution
+## Tests
 
-Après les essais et la remise des données d’origine :
+Les tests vérifient les clés uniques, les valeurs nulles, les types de véhicules et les relations entre les courses, les chauffeurs et les zones.
+
+Résultat vérifié :
 
 ```text
-dbt run  : PASS=9  WARN=0 ERROR=0 SKIP=0 TOTAL=9
-dbt test : PASS=34 WARN=0 ERROR=0 SKIP=0 TOTAL=34
+dbt run  : 9 modèles exécutés, 0 erreur
+dbt test : 34 tests réussis, 0 erreur
 ```
+
+## Documentation
+
+```bash
+dbt docs generate
+dbt docs serve
+```
+
+La documentation est accessible à l’adresse [http://localhost:8080](http://localhost:8080).
