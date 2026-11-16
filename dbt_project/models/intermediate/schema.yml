@@ -1,0 +1,10 @@
+version: 2
+models:
+- name: int_rides_enriched
+  description: Courses enrichies avec la note courante et le véhicule ; modèle éphémère.
+  columns:
+  - name: ride_id
+    description: Clé unique de la ligne.
+    tests:
+    - unique
+    - not_null

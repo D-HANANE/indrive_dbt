@@ -1,0 +1,68 @@
+version: 2
+models:
+- name: dim_driver
+  description: Version courante des chauffeurs.
+  columns:
+  - name: driver_id
+    description: Clé unique de la ligne.
+    tests:
+    - unique
+    - not_null
+- name: dim_vehicle
+  description: Véhicules sans historique, Type 1.
+  columns:
+  - name: vehicle_id
+    description: Clé unique de la ligne.
+    tests:
+    - unique
+    - not_null
+  - name: vehicle_type
+    tests:
+    - accepted_values:
+        arguments:
+          values:
+          - economy
+          - comfort
+          - xl
+- name: dim_zone
+  description: Zones sans historique, Type 1.
+  columns:
+  - name: zone_id
+    description: Clé unique de la ligne.
+    tests:
+    - unique
+    - not_null
+- name: fact_rides
+  description: Une ligne par course.
+  columns:
+  - name: ride_id
+    description: Clé unique de la ligne.
+    tests:
+    - unique
+    - not_null
+  - name: driver_id
+    tests:
+    - relationships:
+        arguments:
+          to: ref('dim_driver')
+          field: driver_id
+  - name: pickup_zone_id
+    tests:
+    - relationships:
+        arguments:
+          to: ref('dim_zone')
+          field: zone_id
+  - name: dropoff_zone_id
+    tests:
+    - relationships:
+        arguments:
+          to: ref('dim_zone')
+          field: zone_id
+- name: fct_driver_daily_earnings
+  description: Gains par chauffeur et jour, cumul et classement.
+  columns:
+  - name: driver_day_id
+    description: Clé unique de la ligne.
+    tests:
+    - unique
+    - not_null

@@ -1,0 +1,34 @@
+version: 2
+models:
+- name: stg_drivers
+  description: Typage de la source drivers.
+  columns:
+  - name: driver_id
+    description: Clé unique de la ligne.
+    tests:
+    - unique
+    - not_null
+- name: stg_vehicles
+  description: Typage de la source vehicles.
+  columns:
+  - name: vehicle_id
+    description: Clé unique de la ligne.
+    tests:
+    - unique
+    - not_null
+- name: stg_zones
+  description: Typage de la source zones.
+  columns:
+  - name: zone_id
+    description: Clé unique de la ligne.
+    tests:
+    - unique
+    - not_null
+- name: stg_ride_events
+  description: Typage de la source ride_events.
+  columns:
+  - name: ride_id
+    description: Clé unique de la ligne.
+    tests:
+    - unique
+    - not_null

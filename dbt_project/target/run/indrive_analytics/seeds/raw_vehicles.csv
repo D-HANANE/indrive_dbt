@@ -1,0 +1,14 @@
+
+    
+    
+    
+    create table "indrive_warehouse"."raw"."raw_vehicles" ("vehicle_id" integer,"driver_id" integer,"make" text,"model" text,"plate_number" text,"vehicle_type" text)
+  ;
+    -- dbt seed --
+    
+          insert into "indrive_warehouse"."raw"."raw_vehicles" ("vehicle_id", "driver_id", "make", "model", "plate_number", "vehicle_type") values
+          (%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s,%s)
+      
+
+;
+  

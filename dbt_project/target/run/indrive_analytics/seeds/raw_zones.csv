@@ -1,0 +1,14 @@
+
+    
+    
+    
+    create table "indrive_warehouse"."raw"."raw_zones" ("zone_id" integer,"zone_name" text,"city" text)
+  ;
+    -- dbt seed --
+    
+          insert into "indrive_warehouse"."raw"."raw_zones" ("zone_id", "zone_name", "city") values
+          (%s,%s,%s),(%s,%s,%s),(%s,%s,%s),(%s,%s,%s),(%s,%s,%s),(%s,%s,%s),(%s,%s,%s),(%s,%s,%s)
+      
+
+;
+  

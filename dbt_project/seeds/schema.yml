@@ -1,0 +1,45 @@
+version: 2
+seeds:
+- name: raw_drivers
+  description: Raw driver roster (loaded by dbt seed).
+  config:
+    column_types:
+      rating: numeric(3,2)
+      joined_date: date
+      phone: varchar
+  columns:
+  - name: driver_id
+    description: Clé unique de la ligne.
+    tests:
+    - unique
+    - not_null
+- name: raw_vehicles
+  description: Raw vehicle fleet (loaded by dbt seed).
+  columns:
+  - name: vehicle_id
+    description: Clé unique de la ligne.
+    tests:
+    - unique
+    - not_null
+- name: raw_zones
+  description: Raw zone list (loaded by dbt seed).
+  columns:
+  - name: zone_id
+    description: Clé unique de la ligne.
+    tests:
+    - unique
+    - not_null
+- name: raw_ride_events
+  description: Raw ride events (loaded by dbt seed).
+  config:
+    column_types:
+      ride_id: varchar
+      distance_km: numeric(6,1)
+      fare_amount: numeric(10,2)
+      requested_at: timestamp
+  columns:
+  - name: ride_id
+    description: Clé unique de la ligne.
+    tests:
+    - unique
+    - not_null
